@@ -18,6 +18,15 @@ ddk_module(
 )
 
 
+# Input
+ddk_module(
+    name = "rsinput",
+    srcs = ["drivers/input/joystick/rsinput.c"],
+    out = "rsinput.ko",
+    kernel_build = ":kernel",
+)
+
+
 # LEDs
 ddk_module(
     name = "leds-htr3212",
