@@ -4,6 +4,15 @@ load("//build/kernel/kleaf:kernel.bzl", "ddk_module")
 
 package(default_visibility = ["//vendor/ayn/qcs8550:__pkg__"])
 
+# Backlights
+ddk_module(
+    name = "odin2mini-backlight",
+    srcs = ["drivers/video/backlight/odin2mini-backlight.c"],
+    out = "odin2mini-backlight.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
+
+
 # Panels
 ddk_module(
     name = "panel-synaptics-td4328",
