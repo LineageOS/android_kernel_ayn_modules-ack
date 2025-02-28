@@ -9,6 +9,15 @@ alias(
     actual = "//vendor/ayn/kernel:kernel_aarch64",
 )
 
+# Backlights
+ddk_module(
+    name = "odin2mini-backlight",
+    srcs = ["drivers/video/backlight/odin2mini-backlight.c"],
+    out = "odin2mini-backlight.ko",
+    kernel_build = ":kernel",
+)
+
+
 # Panels
 ddk_module(
     name = "panel-synaptics-td4328",
