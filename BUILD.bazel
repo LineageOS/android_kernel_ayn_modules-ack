@@ -33,3 +33,10 @@ ddk_module(
     out = "panel-chipone-icna35xx.ko",
     kernel_build = ":kernel",
 )
+
+ddk_module(
+    name = "panel-chipwealth-ch13726a",
+    srcs = ["drivers/gpu/drm/panel/panel-chipwealth-ch13726a.c"],
+    out = "panel-chipwealth-ch13726a.ko",
+    kernel_build = ":kernel",
+)
