@@ -11,3 +11,10 @@ ddk_module(
     out = "panel-synaptics-td4328.ko",
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
+
+ddk_module(
+    name = "panel-boe-xm91080g",
+    srcs = ["drivers/gpu/drm/panel/panel-boe-xm91080g.c"],
+    out = "panel-boe-xm91080g.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
