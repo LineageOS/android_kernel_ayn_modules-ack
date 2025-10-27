@@ -41,3 +41,12 @@ ddk_module(
     out = "panel-ddic-ch13726a.ko",
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
+
+
+# PWM
+ddk_module(
+    name = "pwm-sn3112",
+    srcs = ["drivers/pwm/pwm-sn3112.c"],
+    out = "pwm-sn3112.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
