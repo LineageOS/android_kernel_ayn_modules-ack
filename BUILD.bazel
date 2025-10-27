@@ -66,3 +66,12 @@ ddk_module(
     out = "panel-visionox-vtdr6130.ko",
     kernel_build = ":kernel",
 )
+
+
+# PWM
+ddk_module(
+    name = "pwm-sn3112",
+    srcs = ["drivers/pwm/pwm-sn3112.c"],
+    out = "pwm-sn3112.ko",
+    kernel_build = ":kernel",
+)
