@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * DDIC CH13726A MIPI-DSI panel driver
+ * ChipWealth CH13726A MIPI-DSI panel driver
  * Copyright (c) 2024, Teguh Sobirin <teguh@sobir.in>.
  */
 
@@ -50,7 +50,7 @@ static int ch13726a_on(struct ch13726a_panel *ctx)
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xf0, 0x50);
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xb9, 0x00);
-	
+
 	mipi_dsi_dcs_exit_sleep_mode_multi(&dsi_ctx);
 
 	mipi_dsi_dcs_set_display_on_multi(&dsi_ctx);
@@ -118,35 +118,7 @@ static int ch13726a_unprepare(struct drm_panel *panel)
 	return 0;
 }
 
-static const struct drm_display_mode rp5_display_mode = {
-	.clock = (1080 + 12 + 4 + 12) * (1920 + 12 + 4 + 12) * 60 / 1000,
-	.hdisplay = 1080,
-	.hsync_start = 1080 + 12,
-	.hsync_end = 1080 + 12 + 4,
-	.htotal = 1080 + 12 + 4 + 12,
-	.vdisplay = 1920,
-	.vsync_start = 1920 + 12,
-	.vsync_end = 1920 + 12 + 4,
-	.vtotal = 1920 + 12 + 4 + 12,
-	.width_mm = 68,
-	.height_mm = 121,
-};
-
-static const struct drm_display_mode rpmini_display_mode = {
-	.clock = (960 + 28 + 4 + 36) * (1280 + 16 + 4 + 8) * 60 / 1000,
-	.hdisplay = 960,
-	.hsync_start = 960 + 28,
-	.hsync_end = 960 + 28 + 4,
-	.htotal = 960 + 28 + 4 + 36,
-	.vdisplay = 1280,
-	.vsync_start = 1280 + 16,
-	.vsync_end = 1280 + 16 + 4,
-	.vtotal = 1280 + 16 + 4 + 8,
-	.width_mm = 65,
-	.height_mm = 75,
-};
-
-static const struct drm_display_mode rpminiv2_display_mode = {
+static const struct drm_display_mode thor_bottom_display_mode = {
 	.clock = (1080 + 28 + 4 + 36) * (1240 + 16 + 4 + 8) * 60 / 1000,
 	.hdisplay = 1080,
 	.hsync_start = 1080 + 28,
@@ -305,10 +277,7 @@ static void ch13726a_remove(struct mipi_dsi_device *dsi)
 }
 
 static const struct of_device_id ch13726a_of_match[] = {
-	{ .compatible = "ch13726a,rp5", .data = &rp5_display_mode },
-	{ .compatible = "ch13726a,rpmini", .data = &rpmini_display_mode },
-	{ .compatible = "ch13726a,rpminiv2", .data = &rpminiv2_display_mode },
-	{ .compatible = "ch13726a,thor", .data = &rpminiv2_display_mode },
+	{ .compatible = "ayntec,thor-panel-bottom", .data = &thor_bottom_display_mode },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, ch13726a_of_match);

@@ -54,9 +54,9 @@ ddk_module(
 )
 
 ddk_module(
-    name = "panel-ddic-ch13726a",
-    srcs = ["drivers/gpu/drm/panel/panel-ddic-ch13726a.c"],
-    out = "panel-ddic-ch13726a.ko",
+    name = "panel-chipwealth-ch13726a",
+    srcs = ["drivers/gpu/drm/panel/panel-chipwealth-ch13726a.c"],
+    out = "panel-chipwealth-ch13726a.ko",
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
 
