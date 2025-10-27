@@ -11,3 +11,10 @@ ddk_module(
     out = "panel-synaptics-td4328.ko",
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
+
+ddk_module(
+    name = "panel-xiamen-xm91080",
+    srcs = ["drivers/gpu/drm/panel/panel-xiamen-xm91080.c"],
+    out = "panel-xiamen-xm91080.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
