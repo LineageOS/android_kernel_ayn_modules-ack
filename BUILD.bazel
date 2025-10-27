@@ -8,3 +8,11 @@ alias(
     name = "kernel",
     actual = "//vendor/ayn/kernel:kernel_aarch64",
 )
+
+# Panels
+ddk_module(
+    name = "panel-synaptics-td4328",
+    srcs = ["drivers/gpu/drm/panel/panel-synaptics-td4328.c"],
+    out = "panel-synaptics-td4328.ko",
+    kernel_build = ":kernel",
+)
