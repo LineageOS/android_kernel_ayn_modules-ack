@@ -23,3 +23,13 @@ ddk_module(
     out = "panel-xiamen-xm91080.ko",
     kernel_build = ":kernel",
 )
+
+ddk_module(
+    name = "panel-chipone-icna35xx",
+    srcs = [
+        "drivers/gpu/drm/panel/drm_helper_shim.c",
+        "drivers/gpu/drm/panel/panel-chipone-icna35xx.c",
+    ],
+    out = "panel-chipone-icna35xx.ko",
+    kernel_build = ":kernel",
+)
