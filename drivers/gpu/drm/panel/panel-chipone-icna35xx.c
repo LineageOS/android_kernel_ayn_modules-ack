@@ -95,49 +95,48 @@ static int icna3512_init_sequence(struct panel_info *pinfo)
 
 	pinfo->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A);
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x53, 0xE0);
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00);
 
 	mipi_dsi_dcs_exit_sleep_mode_multi(&dsi_ctx);
 
 	mipi_dsi_msleep(&dsi_ctx, 120);
 
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x0F);
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x0F);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
 	if (cur_vrefresh == 120) {
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 
-                0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83, 
-                0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10, 
-                0x14, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x9C, 0x00, 
-                0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18, 
-                0x18, 0x18, 0x18);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
+			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
+			0x14, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x9C, 0x00,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18,
+			0x18, 0x18, 0x18);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5,
-                0x04, 0x0C, 0x08, 0x0C, 0x04, 0x00, 0xC4);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
-                0x88, 0x40, 0x40, 0x88, 0x40, 0x40, 0x00, 0xEB,
-                0x11, 0xFF);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
-                0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
-	}
-	else {
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 
-                0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
-                0x04, 0x18, 0x08, 0x0C, 0x02, 0x00, 0xC4);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
-                0x88, 0x4A, 0x4A, 0x88, 0x4A, 0x4A, 0x00, 0xEB, 
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
-                0x01, 0x01, 0x01, 0x01, 0x04, 0x2C);
-        mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
+			0x04, 0x0C, 0x08, 0x0C, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
+			0x88, 0x40, 0x40, 0x88, 0x40, 0x40, 0x00, 0xEB,
+			0x11, 0xFF);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
+	} else {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
+			0x04, 0x18, 0x08, 0x0C, 0x02, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
+			0x88, 0x4A, 0x4A, 0x88, 0x4A, 0x4A, 0x00, 0xEB,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
 	}
 
 	drm_dsc_pps_payload_pack(&pps, &pinfo->desc->dsc);
@@ -160,11 +159,11 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 	pinfo->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A);
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x53, 0xE0);
-    mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00);
 
 	mipi_dsi_dcs_exit_sleep_mode_multi(&dsi_ctx);
 
@@ -173,15 +172,14 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 	if (cur_vrefresh == 120) {
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 
-                0x00, 0xD8, 0x00, 0x1C, 0x00, 0x4C);
-	}
-	else {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xD8, 0x00, 0x1C, 0x00, 0x4C);
+	} else {
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x10);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 
-                0x00, 0xDB, 0x00, 0x1C, 0x00, 0x1C, 0x00, 0x00,
-				0xDB, 0x00, 0x1C, 0x07, 0xD6, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xDB, 0x00, 0x1C, 0x00, 0x1C, 0x00, 0x00,
+			0xDB, 0x00, 0x1C, 0x07, 0xD6, 0x00);
 	}
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
@@ -195,7 +193,7 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 	drm_dsc_pps_payload_pack(&pps, &pinfo->desc->dsc);
 	mipi_dsi_picture_parameter_set_multi(&dsi_ctx, &pps);
-	
+
 	mipi_dsi_msleep(&dsi_ctx, 20);
 
 	mipi_dsi_dcs_set_display_on_multi(&dsi_ctx);
@@ -203,7 +201,7 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 	return dsi_ctx.accum_err;
 }
 
-static const struct drm_display_mode icna3512_modes[] = {
+static const struct drm_display_mode odin2portal_modes[] = {
 	{
 		/* 120Hz */
 		.clock = (1080 + 156 + 1 + 23) * (1920 + 412 + 1 + 15) * 120 / 1000,
@@ -230,7 +228,7 @@ static const struct drm_display_mode icna3512_modes[] = {
 	}
 };
 
-static const struct drm_display_mode icna3520_modes[] = {
+static const struct drm_display_mode thor_top_modes[] = {
 	{
 		/* 120Hz */
 		.clock = (1080 + 24 + 1 + 24) * (1920 + 28 + 1 + 28) * 120 / 1000,
@@ -257,15 +255,16 @@ static const struct drm_display_mode icna3520_modes[] = {
 	}
 };
 
-static struct panel_desc icna3512_desc = {
-	.modes = icna3512_modes,
-	.num_modes = ARRAY_SIZE(icna3512_modes),
+static struct panel_desc odin2portal_desc = {
+	.modes = odin2portal_modes,
+	.num_modes = ARRAY_SIZE(odin2portal_modes),
 	.width_mm = 160,
 	.height_mm = 89,
 	.bpc = 8,
 	.lanes = 4,
 	.format = MIPI_DSI_FMT_RGB888,
-	.mode_flags = MIPI_DSI_MODE_NO_EOT_PACKET | MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_LPM,
+	.mode_flags = MIPI_DSI_MODE_NO_EOT_PACKET | MIPI_DSI_CLOCK_NON_CONTINUOUS |
+			MIPI_DSI_MODE_LPM,
 	.init_sequence = icna3512_init_sequence,
 	.dsc = {
 		.dsc_version_major = 0x1,
@@ -279,15 +278,16 @@ static struct panel_desc icna3512_desc = {
 	},
 };
 
-static struct panel_desc icna3520_desc = {
-	.modes = icna3520_modes,
-	.num_modes = ARRAY_SIZE(icna3520_modes),
+static struct panel_desc thor_top_desc = {
+	.modes = thor_top_modes,
+	.num_modes = ARRAY_SIZE(thor_top_modes),
 	.width_mm = 136,
 	.height_mm = 68,
 	.bpc = 8,
 	.lanes = 4,
 	.format = MIPI_DSI_FMT_RGB888,
-	.mode_flags =  MIPI_DSI_MODE_NO_EOT_PACKET | MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_LPM,
+	.mode_flags =  MIPI_DSI_MODE_NO_EOT_PACKET | MIPI_DSI_CLOCK_NON_CONTINUOUS |
+			MIPI_DSI_MODE_LPM,
 	.init_sequence = icna3520_init_sequence,
 	.dsc = {
 		.dsc_version_major = 0x1,
@@ -316,7 +316,7 @@ static int icna35xx_prepare(struct drm_panel *panel)
 	struct panel_info *pinfo = to_panel_info(panel);
 	int ret;
 
-    ret = regulator_bulk_enable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
+	ret = regulator_bulk_enable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
 	if (ret < 0) {
 		dev_err(panel->dev, "failed to enable regulators: %d\n", ret);
 		return ret;
@@ -326,7 +326,7 @@ static int icna35xx_prepare(struct drm_panel *panel)
 
 	ret = pinfo->desc->init_sequence(pinfo);
 	if (ret < 0) {
-        regulator_bulk_disable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
+		regulator_bulk_disable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
 		dev_err(panel->dev, "failed to initialize panel: %d\n", ret);
 		return ret;
 	}
@@ -354,7 +354,7 @@ static int icna35xx_unprepare(struct drm_panel *panel)
 	struct panel_info *pinfo = to_panel_info(panel);
 
 	gpiod_set_value_cansleep(pinfo->reset_gpio, 1);
-    regulator_bulk_disable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
+	regulator_bulk_disable(ARRAY_SIZE(panel_supplies), pinfo->supplies);
 
 	return 0;
 }
@@ -483,9 +483,8 @@ static int icna35xx_probe(struct mipi_dsi_device *dsi)
 
 	ret = devm_regulator_bulk_get_const(dev, ARRAY_SIZE(panel_supplies),
 	panel_supplies, &pinfo->supplies);
-	if (ret < 0){
+	if (ret < 0)
 		return dev_err_probe(dev, ret, "Failed to get regulators\n");
-	}
 
 	pinfo->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
 	if (IS_ERR(pinfo->reset_gpio))
@@ -507,31 +506,31 @@ static int icna35xx_probe(struct mipi_dsi_device *dsi)
 
 	pinfo->panel.prepare_prev_first = true;
 
-    pinfo->panel.backlight = icna35xx_create_backlight(dsi);
+	pinfo->panel.backlight = icna35xx_create_backlight(dsi);
 	if (IS_ERR(pinfo->panel.backlight))
 		return dev_err_probe(dev, PTR_ERR(pinfo->panel.backlight),
 				     "Failed to create backlight\n");
 
 	drm_panel_add(&pinfo->panel);
 
-    pinfo->dsi->lanes = pinfo->desc->lanes;
-    pinfo->dsi->format = pinfo->desc->format;
-    pinfo->dsi->mode_flags = pinfo->desc->mode_flags;
-    pinfo->dsi->dsc = &pinfo->desc->dsc;
+	pinfo->dsi->lanes = pinfo->desc->lanes;
+	pinfo->dsi->format = pinfo->desc->format;
+	pinfo->dsi->mode_flags = pinfo->desc->mode_flags;
+	pinfo->dsi->dsc = &pinfo->desc->dsc;
 
-    ret = mipi_dsi_attach(pinfo->dsi);
-    if (ret < 0){
+	ret = mipi_dsi_attach(pinfo->dsi);
+	if (ret < 0) {
 		dev_err_probe(dev, ret, "Failed to attach to DSI host\n");
 		drm_panel_remove(&pinfo->panel);
-        return ret;
-    }
+		return ret;
+	}
 
 	return 0;
 }
 
 static const struct of_device_id icna35xx_of_match[] = {
-	{ .compatible = "chipone,icna3512", .data = &icna3512_desc },
-	{ .compatible = "chipone,icna3520", .data = &icna3520_desc },
+	{ .compatible = "ayntec,odin2portal-panel", .data = &odin2portal_desc },
+	{ .compatible = "ayntec,thor-panel-top", .data = &thor_top_desc },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, icna35xx_of_match);
