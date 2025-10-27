@@ -3,3 +3,11 @@
 load("//build/kernel/kleaf:kernel.bzl", "ddk_module")
 
 package(default_visibility = ["//vendor/ayn/qcs8550:__pkg__"])
+
+# Panels
+ddk_module(
+    name = "panel-synaptics-td4328",
+    srcs = ["drivers/gpu/drm/panel/panel-synaptics-td4328.c"],
+    out = "panel-synaptics-td4328.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
