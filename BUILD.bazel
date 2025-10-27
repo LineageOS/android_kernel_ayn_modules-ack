@@ -13,6 +13,15 @@ ddk_module(
 )
 
 
+# LEDs
+ddk_module(
+    name = "leds-htr3212",
+    srcs = ["drivers/leds/leds-htr3212.c"],
+    out = "leds-htr3212.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
+
+
 # Panels
 ddk_module(
     name = "panel-synaptics-td4328",
