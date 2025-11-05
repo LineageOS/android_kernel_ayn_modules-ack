@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+load("//build/kernel/kleaf:kernel.bzl", "ddk_module")
+
+package(default_visibility = ["//vendor/ayn/qcs8550:__pkg__"])
