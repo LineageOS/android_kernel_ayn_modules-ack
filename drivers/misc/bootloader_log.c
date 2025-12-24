@@ -9,7 +9,7 @@
 #include <linux/slab.h>
 #include <linux/pstore.h>
 
-#define BOOTLOADER_LOGGER_COMPATIBLE_NAME "nothing,bootloader_log"
+#define BOOTLOADER_LOGGER_COMPATIBLE_NAME "qcom,bootloader_log"
 #define PROC_NAME "bootloader_log"
 
 char *bootloader_log_buf;
