@@ -31,6 +31,15 @@ ddk_module(
 )
 
 
+# Logging
+ddk_module(
+    name = "bootloader_log",
+    srcs = ["drivers/misc/bootloader_log.c"],
+    out = "bootloader_log.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
+
+
 # Panels
 ddk_module(
     name = "panel-synaptics-td4328",
