@@ -66,7 +66,7 @@ static const unsigned int keymap[] = {
     BTN_DPAD_UP, BTN_DPAD_DOWN, BTN_DPAD_LEFT, BTN_DPAD_RIGHT,
     BTN_WEST,   BTN_NORTH,	    BTN_EAST,	   BTN_SOUTH,
     BTN_TL,	     BTN_TR,	    BTN_SELECT,	   BTN_START,
-    BTN_THUMBL,  BTN_THUMBR,    BTN_MODE,	   BTN_BACK
+    BTN_THUMBL,  BTN_THUMBR,    BTN_MODE,	   KEY_BACK
 };
 
 static uint8_t compute_checksum(const uint8_t *data, size_t len) {
