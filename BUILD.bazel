@@ -69,6 +69,13 @@ ddk_module(
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
 
+ddk_module(
+    name = "panel-retroid-pocket-6",
+    srcs = ["drivers/gpu/drm/panel/panel-retroid-pocket-6.c"],
+    out = "panel-retroid-pocket-6.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
+
 
 # PWM
 ddk_module(
