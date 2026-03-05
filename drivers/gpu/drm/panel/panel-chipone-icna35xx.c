@@ -95,60 +95,49 @@ static int icna3512_init_sequence(struct panel_info *pinfo)
 
 	pinfo->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5); // Manufacture Command Access
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A); // Manufacture Command Access Unlock
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xFD, 0x5A, 0x5A);
+
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x53, 0xE0);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00);
 
 	mipi_dsi_dcs_exit_sleep_mode_multi(&dsi_ctx);
 
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07); // REG SEL - Group 7
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
-
 	mipi_dsi_msleep(&dsi_ctx, 120);
 
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01); // REG SEL - Group 1
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xC6, 0x11, 0x88); // DSC CFG
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xC7, 0x12, 0x00, 0x00, 0xAB, 0x10, 0xA0, 0x07, 0x80, 0x04, 0x38, 0x00, 0x14, 0x04, 0x38, 0x05, 0x46, 0x01, 0x9A, 0x02, 0xD4, 0x00, 0x19, 0x02, 0x40, 0x00, 0x15, 0x00, 0x0D, 0x05, 0x7A, 0x03, 0x1D); // DSC PPS 1-1
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xC8, 0x16, 0x00, 0x10, 0xEC, 0x07, 0x10, 0x20, 0x00, 0x06, 0x0F, 0x0F, 0x33, 0x0E, 0x1C, 0x2A, 0x38, 0x46, 0x54, 0x62, 0x69, 0x70, 0x77, 0x79, 0x7B, 0x7D, 0x7E, 0x01, 0xC2, 0x22, 0x00, 0x2A, 0x40); // DSC PPS 1-2
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xC9, 0x32, 0xBE, 0x3A, 0xFC, 0x3A, 0xFA, 0x3A, 0xF8, 0x3B, 0x38, 0x3B, 0x78, 0x3B, 0x76, 0x4B, 0xB6, 0x4B, 0xB6, 0x4B, 0xF4, 0x5B, 0xF4, 0x7C, 0x34, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00); // DSC PPS 1-3
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x0F);
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
 
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07); // REG SEL - Group 7
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xE5, 0x01, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17, 0x85, 0x17); // PWM HBM Area Control
-
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x05); // REG SEL - Group 5
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 0x82, 0x00, 0x00, 0x99, 0x99, 0x09, 0x99, 0x00, 0x3E, 0xFE); // BC Control 2
-
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x0E); // REG SEL - Group 14
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2, 0x70, 0x76, 0x04); // CE Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, 0x41, 0xA4, 0x0A, 0x17, 0x14); // EDGE Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB4, 0x31); // Contrast Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5, 0x61); // HDR Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB6, 0x01); // HDR Dimming Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB7, 0x61, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20); // SLR Control
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD6, 0x14, 0x24, 0x08); // PAPERMODE
-
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x0F); // REG SEL - Group 15
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x52);
-
-	if (cur_vrefresh == 165) {
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x20); // Write DSI MODE - HFR_MODE = HF2 Mode, DSI_MODE = Command Mode - Through GRAM
+	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
+	if (cur_vrefresh == 120) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
+			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
+			0x14, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x9C, 0x00,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18,
+			0x18, 0x18, 0x18);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5,
+			0x04, 0x0C, 0x08, 0x0C, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
+			0x88, 0x40, 0x40, 0x88, 0x40, 0x40, 0x00, 0xEB,
+			0x11, 0xFF);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
 	} else {
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01); // REG SEL - Group 1
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3, // Timing Control1
-										 0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
-
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07); // REG SEL - Group 7
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,		// PWM Control 1
-										 0x04, 0x18, 0x08, 0x0C, 0x02, 0x00, 0xC4);
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3, // PWM HMD WD1 MODE0
-										 0x88, 0x4A, 0x4A, 0x88, 0x4A, 0x4A, 0x00, 0xEB,
-										 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB, // PWM HMD Control 1
-										 0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
-		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00); // Write DSI MODE - HFR_MODE = Normal Mode, DSI_MODE = Command Mode - Through GRAM
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
+			0x04, 0x18, 0x08, 0x0C, 0x02, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
+			0x88, 0x4A, 0x4A, 0x88, 0x4A, 0x4A, 0x00, 0xEB,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
 	}
-
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x53, 0xE0); // Write Control Display
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x35, 0x00); // Write Tearing Effect Line On
 
 	drm_dsc_pps_payload_pack(&pps, &pinfo->desc->dsc);
 	mipi_dsi_picture_parameter_set_multi(&dsi_ctx, &pps);
@@ -180,7 +169,7 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 	mipi_dsi_msleep(&dsi_ctx, 120);
 
-	if (cur_vrefresh == 165) {
+	if (cur_vrefresh == 120) {
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
@@ -214,16 +203,16 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 static const struct drm_display_mode odin2portal_modes[] = {
 	{
-		/* 165Hz */
-		.clock = (1080 + 98 + 1 + 23) * (1920 + 20 + 1 + 15) * 165 / 1000,
+		/* 120Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 412 + 1 + 15) * 120 / 1000,
 		.hdisplay = 1080,
-		.hsync_start = 1080 + 98,
-		.hsync_end = 1080 + 98 + 1,
-		.htotal = 1080 + 98 + 1 + 23,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
 		.vdisplay = 1920,
-		.vsync_start = 1920 + 20,
-		.vsync_end = 1920 + 20 + 1,
-		.vtotal = 1920 + 20 + 1 + 15,
+		.vsync_start = 1920 + 412,
+		.vsync_end = 1920 + 412 + 1,
+		.vtotal = 1920 + 412 + 1 + 15,
 	},
 	{
 		/* 60Hz */
@@ -279,13 +268,13 @@ static struct panel_desc odin2portal_desc = {
 	.init_sequence = icna3512_init_sequence,
 	.dsc = {
 		.dsc_version_major = 0x1,
-		.dsc_version_minor = 0x2,
+		.dsc_version_minor = 0x1,
 		.slice_height = 20,
-		.slice_width = 1080,
+		.slice_width = 540,
 		.slice_count = 2,
-		.bits_per_component = 10,
-		.bits_per_pixel = 10 << 4,
-		.block_pred_enable = false,
+		.bits_per_component = 8,
+		.bits_per_pixel = 8 << 4,
+		.block_pred_enable = true,
 	},
 };
 
