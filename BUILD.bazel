@@ -79,6 +79,16 @@ ddk_module(
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
 
+ddk_module(
+    name = "panel-visionox-vtdr6130",
+    srcs = [
+        "drivers/gpu/drm/panel/drm_helper_shim.c",
+        "drivers/gpu/drm/panel/panel-visionox-vtdr6130.c",
+    ],
+    out = "panel-visionox-vtdr6130.ko",
+    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+)
+
 
 # PWM
 ddk_module(
