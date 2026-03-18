@@ -40,3 +40,13 @@ ddk_module(
     out = "panel-chipwealth-ch13726a.ko",
     kernel_build = ":kernel",
 )
+
+ddk_module(
+    name = "panel-visionox-vtdr6130",
+    srcs = [
+        "drivers/gpu/drm/panel/drm_helper_shim.c",
+        "drivers/gpu/drm/panel/panel-visionox-vtdr6130.c",
+    ],
+    out = "panel-visionox-vtdr6130.ko",
+    kernel_build = ":kernel",
+)
