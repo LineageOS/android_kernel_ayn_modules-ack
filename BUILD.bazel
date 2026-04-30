@@ -57,7 +57,10 @@ ddk_module(
 
 ddk_module(
     name = "panel-chipone-icna35xx",
-    srcs = ["drivers/gpu/drm/panel/panel-chipone-icna35xx.c"],
+    srcs = [
+        "drivers/gpu/drm/panel/drm_helper_shim.c",
+        "drivers/gpu/drm/panel/panel-chipone-icna35xx.c",
+    ],
     out = "panel-chipone-icna35xx.ko",
     kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
 )
