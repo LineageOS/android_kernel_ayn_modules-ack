@@ -2,14 +2,19 @@
 
 load("//build/kernel/kleaf:kernel.bzl", "ddk_module")
 
-package(default_visibility = ["//vendor/ayn/qcs8550:__pkg__"])
+package(default_visibility = ["//vendor/ayn:__subpackages__"])
+
+alias(
+    name = "kernel",
+    actual = "//vendor/ayn/kernel:kernel_aarch64",
+)
 
 # Backlights
 ddk_module(
     name = "odin2mini-backlight",
     srcs = ["drivers/video/backlight/odin2mini-backlight.c"],
     out = "odin2mini-backlight.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 
@@ -18,7 +23,7 @@ ddk_module(
     name = "rsinput",
     srcs = ["drivers/input/joystick/rsinput.c"],
     out = "rsinput.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 
@@ -27,7 +32,7 @@ ddk_module(
     name = "leds-htr3212",
     srcs = ["drivers/leds/leds-htr3212.c"],
     out = "leds-htr3212.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 
@@ -36,7 +41,7 @@ ddk_module(
     name = "bootloader_log",
     srcs = ["drivers/misc/bootloader_log.c"],
     out = "bootloader_log.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 
@@ -45,14 +50,14 @@ ddk_module(
     name = "panel-synaptics-td4328",
     srcs = ["drivers/gpu/drm/panel/panel-synaptics-td4328.c"],
     out = "panel-synaptics-td4328.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 ddk_module(
     name = "panel-xiamen-xm91080",
     srcs = ["drivers/gpu/drm/panel/panel-xiamen-xm91080.c"],
     out = "panel-xiamen-xm91080.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 ddk_module(
@@ -62,14 +67,14 @@ ddk_module(
         "drivers/gpu/drm/panel/panel-chipone-icna35xx.c",
     ],
     out = "panel-chipone-icna35xx.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 ddk_module(
     name = "panel-chipwealth-ch13726a",
     srcs = ["drivers/gpu/drm/panel/panel-chipwealth-ch13726a.c"],
     out = "panel-chipwealth-ch13726a.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 ddk_module(
@@ -79,7 +84,7 @@ ddk_module(
         "drivers/gpu/drm/panel/panel-visionox-vtdr6130.c",
     ],
     out = "panel-visionox-vtdr6130.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
 
 
@@ -88,5 +93,5 @@ ddk_module(
     name = "pwm-sn3112",
     srcs = ["drivers/pwm/pwm-sn3112.c"],
     out = "pwm-sn3112.ko",
-    kernel_build = "//vendor/ayn/qcs8550:kernel_aarch64_qcs8550",
+    kernel_build = ":kernel",
 )
