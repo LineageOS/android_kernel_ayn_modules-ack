@@ -109,7 +109,25 @@ static int icna3512_init_sequence(struct panel_info *pinfo)
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
-	if (cur_vrefresh == 120) {
+	if (cur_vrefresh == 165) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x20);
+	} else if (cur_vrefresh == 144) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
+			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
+			0x14, 0x00, 0x00, 0xE0, 0x00, 0x10, 0x14, 0x00,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18,
+			0x18, 0x18, 0x18);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5,
+			0x04, 0x0A, 0x08, 0x0A, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
+			0x66, 0xE4, 0xE4, 0x66, 0xE4, 0xE4, 0x00, 0xC4,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x07, 0xA4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
+	} else if (cur_vrefresh == 120) {
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
 			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
 			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
@@ -125,6 +143,18 @@ static int icna3512_init_sequence(struct panel_info *pinfo)
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
 			0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
+	} else if (cur_vrefresh == 90) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0x40, 0x10, 0xA8, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
+			0x04, 0x10, 0x08, 0x0C, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
+			0x55, 0x80, 0x80, 0x55, 0x80, 0xB0, 0x00, 0x9C,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x06, 0x1C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
 	} else {
 		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
 			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
@@ -203,6 +233,30 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 static const struct drm_display_mode odin2portal_modes[] = {
 	{
+		/* 165Hz */
+		.clock = (1080 + 98 + 1 + 23) * (1920 + 20 + 1 + 15) * 165 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 98,
+		.hsync_end = 1080 + 98 + 1,
+		.htotal = 1080 + 98 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 20,
+		.vsync_end = 1920 + 20 + 1,
+		.vtotal = 1920 + 20 + 1 + 15,
+	},
+	{
+		/* 144Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 20 + 1 + 15) * 144 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 20,
+		.vsync_end = 1920 + 20 + 1,
+		.vtotal = 1920 + 20 + 1 + 15,
+	},
+	{
 		/* 120Hz */
 		.clock = (1080 + 156 + 1 + 23) * (1920 + 412 + 1 + 15) * 120 / 1000,
 		.hdisplay = 1080,
@@ -213,6 +267,18 @@ static const struct drm_display_mode odin2portal_modes[] = {
 		.vsync_start = 1920 + 412,
 		.vsync_end = 1920 + 412 + 1,
 		.vtotal = 1920 + 412 + 1 + 15,
+	},
+	{
+		/* 90Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 1192 + 1 + 15) * 90 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 1192,
+		.vsync_end = 1920 + 1192 + 1,
+		.vtotal = 1920 + 1192 + 1 + 15,
 	},
 	{
 		/* 60Hz */
@@ -477,9 +543,11 @@ static int icna35xx_probe(struct mipi_dsi_device *dsi)
 	struct panel_info *pinfo;
 	int ret;
 
-	pinfo = devm_kzalloc(dev, sizeof(*pinfo), GFP_KERNEL);
-	if (!pinfo)
-		return -ENOMEM;
+	pinfo = devm_drm_panel_alloc(dev, __typeof(*pinfo), panel,
+				     &icna35xx_panel_funcs,
+				     DRM_MODE_CONNECTOR_DSI);
+	if (IS_ERR(pinfo))
+		return PTR_ERR(pinfo);
 
 	ret = devm_regulator_bulk_get_const(dev, ARRAY_SIZE(panel_supplies),
 	panel_supplies, &pinfo->supplies);
@@ -496,7 +564,6 @@ static int icna35xx_probe(struct mipi_dsi_device *dsi)
 
 	pinfo->dsi = dsi;
 	mipi_dsi_set_drvdata(dsi, pinfo);
-	drm_panel_init(&pinfo->panel, dev, &icna35xx_panel_funcs, DRM_MODE_CONNECTOR_DSI);
 
 	ret = of_drm_get_panel_orientation(dev->of_node, &pinfo->orientation);
 	if (ret < 0) {
@@ -530,6 +597,7 @@ static int icna35xx_probe(struct mipi_dsi_device *dsi)
 
 static const struct of_device_id icna35xx_of_match[] = {
 	{ .compatible = "ayntec,odin2portal-panel", .data = &odin2portal_desc },
+	{ .compatible = "ayntec,odin3-panel", .data = &thor_top_desc },
 	{ .compatible = "ayntec,thor-panel-top", .data = &thor_top_desc },
 	{ /* sentinel */ }
 };
