@@ -38,7 +38,7 @@ struct xm91080 {
 	struct drm_panel panel;
 	struct mipi_dsi_device *dsi;
 	const struct xm91080_panel_desc *desc;
-	struct regulator_bulk_data supplies[5];
+	struct regulator_bulk_data supplies[4];
 	struct gpio_desc *reset;
 	unsigned int sleep_delay;
 	enum drm_panel_orientation orientation;
@@ -370,7 +370,6 @@ static int xm91080_dsi_probe(struct mipi_dsi_device *dsi)
 	xm91080->supplies[1].supply = "vddio";
 	xm91080->supplies[2].supply = "vci";
 	xm91080->supplies[3].supply = "disp";
-	xm91080->supplies[4].supply = "blvdd";
 
 	ret = devm_regulator_bulk_get(&dsi->dev, ARRAY_SIZE(xm91080->supplies),
 				      xm91080->supplies);
