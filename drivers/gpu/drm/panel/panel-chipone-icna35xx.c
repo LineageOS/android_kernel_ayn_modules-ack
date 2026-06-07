@@ -22,7 +22,6 @@
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
-#include <drm/drm_probe_helper.h>
 
 struct panel_info {
 	struct drm_panel panel;
@@ -64,10 +63,35 @@ static inline struct panel_info *to_panel_info(struct drm_panel *panel)
 	return container_of(panel, struct panel_info, panel);
 }
 
+static int icna35xx_get_current_mode(struct panel_info *pinfo)
+{
+	struct drm_connector *connector = pinfo->connector;
+	struct drm_crtc_state *crtc_state;
+	int i;
+
+	/* Return the default (first) mode if no info available yet */
+	if (!connector->state || !connector->state->crtc)
+		return 0;
+
+	crtc_state = connector->state->crtc->state;
+
+	for (i = 0; i < pinfo->desc->num_modes; i++) {
+		if (drm_mode_match(&crtc_state->mode,
+				   &pinfo->desc->modes[i],
+				   DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_CLOCK))
+			return i;
+	}
+
+	return 0;
+}
+
 static int icna3512_init_sequence(struct panel_info *pinfo)
 {
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = pinfo->dsi };
 	struct drm_dsc_picture_parameter_set pps;
+
+	int cur_mode = icna35xx_get_current_mode(pinfo);
+	int cur_vrefresh = drm_mode_vrefresh(&pinfo->desc->modes[cur_mode]);
 
 	pinfo->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
@@ -85,9 +109,65 @@ static int icna3512_init_sequence(struct panel_info *pinfo)
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE, 0x22);
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
-
-	/* 165 hz */
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x20);
+	if (cur_vrefresh == 165) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x20);
+	} else if (cur_vrefresh == 144) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
+			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
+			0x14, 0x00, 0x00, 0xE0, 0x00, 0x10, 0x14, 0x00,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18,
+			0x18, 0x18, 0x18);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5,
+			0x04, 0x0A, 0x08, 0x0A, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
+			0x66, 0xE4, 0xE4, 0x66, 0xE4, 0xE4, 0x00, 0xC4,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x07, 0xA4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
+	} else if (cur_vrefresh == 120) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00, 0x02, 0x83,
+			0x00, 0x10, 0x14, 0x00, 0x00, 0xC3, 0x00, 0x10,
+			0x14, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x9C, 0x00,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x22, 0x18, 0x18,
+			0x18, 0x18, 0x18);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB5,
+			0x04, 0x0C, 0x08, 0x0C, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD9,
+			0x88, 0x40, 0x40, 0x88, 0x40, 0x40, 0x00, 0xEB,
+			0x11, 0xFF);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCE,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x09, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x30);
+	} else if (cur_vrefresh == 90) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0x40, 0x10, 0xA8, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
+			0x04, 0x10, 0x08, 0x0C, 0x04, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
+			0x55, 0x80, 0x80, 0x55, 0x80, 0xB0, 0x00, 0x9C,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x06, 0x1C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
+	} else {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xE0, 0xA0, 0x10, 0xC8, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x07);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2,
+			0x04, 0x18, 0x08, 0x0C, 0x02, 0x00, 0xC4);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xD3,
+			0x88, 0x4A, 0x4A, 0x88, 0x4A, 0x4A, 0x00, 0xEB,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xCB,
+			0x01, 0x01, 0x01, 0x01, 0x04, 0x2C);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
+	}
 
 	drm_dsc_pps_payload_pack(&pps, &pinfo->desc->dsc);
 	mipi_dsi_picture_parameter_set_multi(&dsi_ctx, &pps);
@@ -104,6 +184,9 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = pinfo->dsi };
 	struct drm_dsc_picture_parameter_set pps;
 
+	int cur_mode = icna35xx_get_current_mode(pinfo);
+	int cur_vrefresh = drm_mode_vrefresh(&pinfo->desc->modes[cur_mode]);
+
 	pinfo->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9C, 0xA5, 0xA5);
@@ -116,11 +199,18 @@ static int icna3520_init_sequence(struct panel_info *pinfo)
 
 	mipi_dsi_msleep(&dsi_ctx, 120);
 
-	/* 120 hz */
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
-	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
-		0x00, 0xD8, 0x00, 0x1C, 0x00, 0x4C);
+	if (cur_vrefresh == 120) {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xD8, 0x00, 0x1C, 0x00, 0x4C);
+	} else {
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x48, 0x10);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x00);
+		mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB3,
+			0x00, 0xDB, 0x00, 0x1C, 0x00, 0x1C, 0x00, 0x00,
+			0xDB, 0x00, 0x1C, 0x07, 0xD6, 0x00);
+	}
 
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0x9F, 0x01);
 	mipi_dsi_generic_write_seq_multi(&dsi_ctx, 0xB2, 0x00);
@@ -153,6 +243,54 @@ static const struct drm_display_mode odin2portal_modes[] = {
 		.vsync_start = 1920 + 20,
 		.vsync_end = 1920 + 20 + 1,
 		.vtotal = 1920 + 20 + 1 + 15,
+	},
+	{
+		/* 144Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 20 + 1 + 15) * 144 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 20,
+		.vsync_end = 1920 + 20 + 1,
+		.vtotal = 1920 + 20 + 1 + 15,
+	},
+	{
+		/* 120Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 412 + 1 + 15) * 120 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 412,
+		.vsync_end = 1920 + 412 + 1,
+		.vtotal = 1920 + 412 + 1 + 15,
+	},
+	{
+		/* 90Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 1192 + 1 + 15) * 90 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 1192,
+		.vsync_end = 1920 + 1192 + 1,
+		.vtotal = 1920 + 1192 + 1 + 15,
+	},
+	{
+		/* 60Hz */
+		.clock = (1080 + 156 + 1 + 23) * (1920 + 2760 + 1 + 15) * 60 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 156,
+		.hsync_end = 1080 + 156 + 1,
+		.htotal = 1080 + 156 + 1 + 23,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 2760,
+		.vsync_end = 1920 + 2760 + 1,
+		.vtotal = 1920 + 2760 + 1 + 15,
 	}
 };
 
@@ -168,6 +306,18 @@ static const struct drm_display_mode thor_top_modes[] = {
 		.vsync_start = 1920 + 28,
 		.vsync_end = 1920 + 28 + 1,
 		.vtotal = 1920 + 28 + 1 + 28,
+	},
+	{
+		/* 60Hz */
+		.clock = (1080 + 24 + 1 + 24) * (1920 + 2006 + 1 + 28) * 60 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 24,
+		.hsync_end = 1080 + 24 + 1,
+		.htotal = 1080 + 24 + 1 + 24,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 2006,
+		.vsync_end = 1920 + 2006 + 1,
+		.vtotal = 1920 + 2006 + 1 + 28,
 	}
 };
 
@@ -279,8 +429,33 @@ static int icna35xx_get_modes(struct drm_panel *panel,
 			       struct drm_connector *connector)
 {
 	struct panel_info *pinfo = to_panel_info(panel);
+	int i;
 
-	return drm_connector_helper_get_modes_fixed(connector, pinfo->desc->modes);
+	for (i = 0; i < pinfo->desc->num_modes; i++) {
+		const struct drm_display_mode *m = &pinfo->desc->modes[i];
+		struct drm_display_mode *mode;
+
+		mode = drm_mode_duplicate(connector->dev, m);
+		if (!mode) {
+			dev_err(panel->dev, "failed to add mode %ux%u@%u\n",
+				m->hdisplay, m->vdisplay, drm_mode_vrefresh(m));
+			return -ENOMEM;
+		}
+
+		mode->type = DRM_MODE_TYPE_DRIVER;
+		if (i == 0)
+			mode->type |= DRM_MODE_TYPE_PREFERRED;
+
+		drm_mode_set_name(mode);
+		drm_mode_probed_add(connector, mode);
+	}
+
+	connector->display_info.width_mm = pinfo->desc->width_mm;
+	connector->display_info.height_mm = pinfo->desc->height_mm;
+	connector->display_info.bpc = pinfo->desc->bpc;
+	pinfo->connector = connector;
+
+	return pinfo->desc->num_modes;
 }
 
 static enum drm_panel_orientation icna35xx_get_orientation(struct drm_panel *panel)
