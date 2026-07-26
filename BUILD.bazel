@@ -78,6 +78,13 @@ ddk_module(
 )
 
 ddk_module(
+    name = "panel-ilitek-ili7836a",
+    srcs = ["drivers/gpu/drm/panel/panel-ilitek-ili7836a.c"],
+    out = "panel-ilitek-ili7836a.ko",
+    kernel_build = ":kernel",
+)
+
+ddk_module(
     name = "panel-visionox-vtdr6130",
     srcs = [
         "drivers/gpu/drm/panel/drm_helper_shim.c",
