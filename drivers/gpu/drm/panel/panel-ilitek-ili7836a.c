@@ -12,7 +12,6 @@
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
-#include <drm/drm_probe_helper.h>
 
 #include <video/mipi_display.h>
 
@@ -55,9 +54,34 @@ static void ili7836a_reset(struct ili7836a_panel *ctx)
 	msleep(20);
 }
 
+static int ili7836a_get_current_mode(struct ili7836a_panel *ctx)
+{
+	struct drm_connector *connector = ctx->connector;
+	struct drm_crtc_state *crtc_state;
+	int i;
+
+	/* Return the default (first) mode if no info available yet */
+	if (!connector->state || !connector->state->crtc)
+		return 0;
+
+	crtc_state = connector->state->crtc->state;
+
+	for (i = 0; i < ctx->desc->num_modes; i++) {
+		if (drm_mode_match(&crtc_state->mode,
+				   &ctx->desc->modes[i],
+				   DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_CLOCK))
+			return i;
+	}
+
+	return 0;
+}
+
 static int ili7836a_on(struct ili7836a_panel *ctx)
 {
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = ctx->dsi };
+
+	int cur_mode = ili7836a_get_current_mode(ctx);
+	int cur_vrefresh = drm_mode_vrefresh(&ctx->desc->modes[cur_mode]);
 
 	ctx->dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
@@ -71,7 +95,10 @@ static int ili7836a_on(struct ili7836a_panel *ctx)
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x85, 0x15);
 
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0xff, 0x5a, 0xa5, 0x00);
-	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x60, 0x00);
+	if (cur_vrefresh == 120)
+		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x60, 0x00);
+	else
+		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x60, 0x01);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6d, 0x00);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x35);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x53, 0x20);
@@ -152,6 +179,18 @@ static const struct drm_display_mode nova_modes[] = {
 		.vsync_start = 960 + 12,
 		.vsync_end = 960 + 12 + 2,
 		.vtotal = 960 + 12 + 2 + 24,
+	},
+	{
+		/* 60Hz */
+		.clock = (1280 + 12 + 2 + 8) * (960 + 12 + 2 + 24) * 60 / 1000,
+		.hdisplay = 1280,
+		.hsync_start = 1280 + 12,
+		.hsync_end = 1280 + 12 + 2,
+		.htotal = 1280 + 12 + 2 + 8,
+		.vdisplay = 960,
+		.vsync_start = 960 + 12,
+		.vsync_end = 960 + 12 + 2,
+		.vtotal = 960 + 12 + 2 + 24,
 	}
 };
 
@@ -168,7 +207,31 @@ static int ili7836a_get_modes(struct drm_panel *panel,
 {
 	struct ili7836a_panel *ctx = to_ili7836a_panel(panel);
 
-	return drm_connector_helper_get_modes_fixed(connector, ctx->desc->modes);
+	for (uint8_t i = 0; i < ctx->desc->num_modes; i++) {
+		const struct drm_display_mode *m = &ctx->desc->modes[i];
+		struct drm_display_mode *mode;
+
+		mode = drm_mode_duplicate(connector->dev, m);
+		if (!mode) {
+			dev_err(&ctx->dsi->dev, "failed to add mode %ux%u@%u\n",
+				m->hdisplay, m->vdisplay, drm_mode_vrefresh(m));
+			return -ENOMEM;
+		}
+
+		mode->type = DRM_MODE_TYPE_DRIVER;
+		if (i == 0)
+			mode->type |= DRM_MODE_TYPE_PREFERRED;
+
+		drm_mode_set_name(mode);
+		drm_mode_probed_add(connector, mode);
+	}
+
+	connector->display_info.width_mm = ctx->desc->width_mm;
+	connector->display_info.height_mm = ctx->desc->height_mm;
+	connector->display_info.bpc = ctx->desc->bpc;
+	ctx->connector = connector;
+
+	return ctx->desc->num_modes;
 }
 
 static enum drm_panel_orientation ili7836a_get_orientation(struct drm_panel *panel)
