@@ -10,6 +10,7 @@
 
 #include <drm/display/drm_dsc.h>
 #include <drm/display/drm_dsc_helper.h>
+#include <drm/drm_crtc.h>
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
@@ -53,6 +54,28 @@ static inline struct visionox_vtdr6130 *to_visionox_vtdr6130(struct drm_panel *p
 	return container_of(panel, struct visionox_vtdr6130, panel);
 }
 
+static int visionox_vtdr6130_get_current_mode(struct visionox_vtdr6130 *ctx)
+{
+	struct drm_connector *connector = ctx->connector;
+	struct drm_crtc_state *crtc_state;
+	int i;
+
+	/* Return the default (first) mode if no info available yet */
+	if (!connector->state || !connector->state->crtc)
+		return 0;
+
+	crtc_state = connector->state->crtc->state;
+
+	for (i = 0; i < ctx->desc->num_modes; i++) {
+		if (drm_mode_match(&crtc_state->mode,
+				   &ctx->desc->modes[i],
+				   DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_CLOCK))
+			return i;
+	}
+
+	return 0;
+}
+
 static void visionox_vtdr6130_reset(struct visionox_vtdr6130 *ctx)
 {
 	gpiod_set_value_cansleep(ctx->reset_gpio, 0);
@@ -69,6 +92,9 @@ static int retroidpocket_rp6_on(struct visionox_vtdr6130 *ctx)
 	struct mipi_dsi_multi_context dsi_ctx = { .dsi = dsi };
 	struct drm_dsc_picture_parameter_set pps;
 
+	int cur_mode = visionox_vtdr6130_get_current_mode(ctx);
+	int cur_vrefresh = drm_mode_vrefresh(&ctx->desc->modes[cur_mode]);
+
 	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x03, 0x01);
@@ -79,7 +105,10 @@ static int retroidpocket_rp6_on(struct visionox_vtdr6130 *ctx)
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6f, 0x02);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, MIPI_DCS_SET_ADDRESS_MODE, 0x02);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x59, 0x00);
-	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6c, 0x00);
+	if (cur_vrefresh == 120)
+		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6c, 0x00);
+	else
+		mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6c, 0x01);
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x6d, 0x00);
 
 	mipi_dsi_dcs_write_seq_multi(&dsi_ctx, 0x70, 0x11, 0x00, 0x00, 0x89,
@@ -291,6 +320,17 @@ static const struct drm_display_mode retroidpocket_rp6_modes[] = {
 		.vsync_end = 1920 + 16 + 2,
 		.vtotal = 1920 + 16 + 2 + 20,
 	},
+	{
+		.clock = (1080 + 22 + 2 + 16) * (1920 + 16 + 4 + 1972) * 60 / 1000,
+		.hdisplay = 1080,
+		.hsync_start = 1080 + 22,
+		.hsync_end = 1080 + 22 + 2,
+		.htotal = 1080 + 22 + 2 + 16,
+		.vdisplay = 1920,
+		.vsync_start = 1920 + 16,
+		.vsync_end = 1920 + 16 + 4,
+		.vtotal = 1920 + 16 + 4 + 1972,
+	},
 };
 
 static struct visionox_vtdr6130_desc retroidpocket_rp6_panel_desc = {
@@ -357,20 +397,33 @@ static int visionox_vtdr6130_get_modes(struct drm_panel *panel,
 				       struct drm_connector *connector)
 {
 	struct visionox_vtdr6130 *ctx = to_visionox_vtdr6130(panel);
-	struct drm_display_mode *mode;
+	int i;
 
-	mode = drm_mode_duplicate(connector->dev, ctx->desc->modes);
-	if (!mode)
-		return -ENOMEM;
+	for (i = 0; i < ctx->desc->num_modes; i++) {
+		const struct drm_display_mode *m = &ctx->desc->modes[i];
+		struct drm_display_mode *mode;
 
-	drm_mode_set_name(mode);
+		mode = drm_mode_duplicate(connector->dev, m);
+		if (!mode) {
+			dev_err(panel->dev, "failed to add mode %ux%u@%u\n",
+				m->hdisplay, m->vdisplay, drm_mode_vrefresh(m));
+			return -ENOMEM;
+		}
 
-	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+		mode->type = DRM_MODE_TYPE_DRIVER;
+		if (i == 0)
+			mode->type |= DRM_MODE_TYPE_PREFERRED;
+
+		drm_mode_set_name(mode);
+		drm_mode_probed_add(connector, mode);
+	}
+
 	connector->display_info.width_mm = ctx->desc->width_mm;
 	connector->display_info.height_mm = ctx->desc->height_mm;
-	drm_mode_probed_add(connector, mode);
+	connector->display_info.bpc = ctx->desc->bpc;
+	ctx->connector = connector;
 
-	return 1;
+	return ctx->desc->num_modes;
 }
 
 static enum drm_panel_orientation visionox_vtdr6130_get_orientation(struct drm_panel *panel)
